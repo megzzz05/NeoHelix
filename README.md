@@ -32,7 +32,7 @@ Velora-AI is an AI-powered language learning assistant developed by **NeoHelix**
 ## Clone the repository
 
 ```bash
-git clone [[Your GitHub Repo Link]](https://github.com/megzzz05/NeoHelix)
+git clone https://github.com/megzzz05/NeoHelix
 ```
 
 ## Move into project folder
