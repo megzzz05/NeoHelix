@@ -4,7 +4,7 @@ import os
 
 # Load environment variables
 load_dotenv()
-GEN_AI_KEY = os.getenv("GEMINI_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Placeholder imports for backend functions
 from processing import get_transcript, generate_summary
@@ -266,7 +266,7 @@ with col2:
 
 st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
 generate = st.button("🚀 Begin Smart Extraction")
-st.markdown('</div>', unsafe_allow_html=True) # Closes the border-glow-card wrapper safely
+st.markdown('</div>', unsafe_allow_html=True)  # Closes the border-glow-card wrapper safely
 
 # --------------------------------------------------
 # Output Core Processing Logic
@@ -275,8 +275,8 @@ if generate:
     if not youtube_url:
         st.warning("Please enter a valid YouTube URL first.")
     else:
-        if not GEN_AI_KEY:
-            st.error("Missing Gemini API Key! Please ensure your local `.env` file is set up correctly.")
+        if not GROQ_API_KEY:
+            st.error("Missing GROQ API Key! Please ensure your local `.env` file has GROQ_API_KEY set.")
         else:
             with st.spinner("Decoding video timestamps and fetching text transcripts..."):
                 transcript_text, error = get_transcript(youtube_url)

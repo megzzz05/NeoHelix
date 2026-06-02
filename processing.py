@@ -1,14 +1,12 @@
 import re
 import os
+from dotenv import load_dotenv
 from youtube_transcript_api import YouTubeTranscriptApi
-import google.generativeai as genai
+from openai import OpenAI
 
-# Configure Gemini API
-GEN_AI_KEY = os.getenv("GEMINI_API_KEY")
-if GEN_AI_KEY:
-    genai.configure(api_key=GEN_AI_KEY)
-else:
-    pass
+# Load .env explicitly here too — ensures key is available
+# even when processing.py is imported before app.py calls load_dotenv()
+load_dotenv()
 
 # ----------------------------------------
 # Extract Video ID from YouTube URL
@@ -21,21 +19,16 @@ def extract_video_id(url):
     return None
 
 # ----------------------------------------
-# Get Transcript 
+# Get Transcript
 # ----------------------------------------
 def get_transcript(video_url):
     try:
         video_id = extract_video_id(video_url)
         if not video_id:
             return None, "Invalid YouTube URL"
-        
-        # Initialize the API client instance
-        ytt_api = YouTubeTranscriptApi()
-        
-        # Fetch the transcript objects
-        transcript = ytt_api.fetch(video_id)
-        
-        # FIX: Access the '.text' attribute directly instead of using ['text']
+
+        ytt = YouTubeTranscriptApi()
+        transcript = ytt.fetch(video_id)
         full_text = " ".join([item.text for item in transcript])
         return full_text, None
 
@@ -43,18 +36,22 @@ def get_transcript(video_url):
         return None, f"Error extracting transcript: {str(e)}"
 
 # ----------------------------------------
-# Generate AI Summary (Multilingual)
+# Generate AI Summary (Multilingual) via Grok
 # ----------------------------------------
 def generate_summary(transcript_text, target_language):
     try:
-        if not GEN_AI_KEY:
-            return "Error: Gemini API key not configured. Please set the GEMINI_API_KEY environment variable."
+        # 1. Switch to the Groq API key variable
+        groq_api_key = os.getenv("GROQ_API_KEY")
 
-        # FIX: Using the fully qualified production model name 'models/gemini-1.5-flash'
-        model = genai.GenerativeModel(
-            model_name="models/gemini-1.5-flash"
+        if not groq_api_key:
+            return "Error: Groq API key not configured. Please set the GROQ_API_KEY environment variable."
+
+        # 2. Point to Groq's OpenAI-compatible base URL
+        client = OpenAI(
+            api_key=groq_api_key,
+            base_url="https://api.groq.com/openai/v1",
         )
-        
+
         prompt = f"""
         You are an expert language learning assistant. Your task is to analyze the following YouTube video transcript and generate a comprehensive, structured learning summary.
         
@@ -77,13 +74,23 @@ def generate_summary(transcript_text, target_language):
         Transcript text:
         {transcript_text}
         """
-        
-        # FIX: Pass generation_config parameters directly into the generate_content call
-        response = model.generate_content(
-            prompt,
-            generation_config={"temperature": 0.3}
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile", # 3. Swap 'grok-3' for a valid Groq model
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert multilingual language learning assistant."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.3,
         )
-        return response.text
+
+        return response.choices[0].message.content
 
     except Exception as e:
         return f"Error generating summary: {str(e)}"
