@@ -1,4 +1,8 @@
 import streamlit as st
+from youtube_transcript_api import YouTubeTranscriptApi
+import re
+
+from processing import get_transcript
 
 st.set_page_config(
     page_title="Velora-AI",
@@ -91,111 +95,10 @@ generate = st.button("🚀 Generate Learning Content")
 st.markdown('</div>', unsafe_allow_html=True)
 
 if generate:
-
-    col1, col2 = st.columns([2, 1])
-
-    with col1:
-
-        st.markdown("""
-        <div class="card">
-        <h3>📄 AI Summary</h3>
-        <p>
-        This is where your Gemini/LangChain generated summary
-        will appear after processing the transcript.
-        </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="card">
-        <h3>📚 Important Vocabulary</h3>
-        </div>
-        """, unsafe_allow_html=True)
-
-        vocab_data = {
-            "Word": [
-                "Transcript",
-                "Artificial Intelligence",
-                "Vocabulary",
-                "Language",
-                "Comprehension"
-            ],
-            "Meaning": [
-                "Written version of speech",
-                "Machines simulating intelligence",
-                "Collection of words",
-                "Method of communication",
-                "Understanding something"
-            ]
-        }
-
-        st.table(vocab_data)
-
-    with col2:
-
-        st.markdown("""
-        <div class="card">
-        <h3>📊 Learning Stats</h3>
-        <p>Words Learned: 5</p>
-        <p>Quiz Score: 0/3</p>
-        <p>Language: Selected Language</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="card">
-    <h3>📝 Vocabulary Quiz</h3>
-    </div>
-    """, unsafe_allow_html=True)
-
-    q1 = st.radio(
-        "1. What is a transcript?",
-        [
-            "A written version of speech",
-            "A video format",
-            "A language",
-            "An AI model"
-        ]
+    transcript_text = get_transcript(youtube_url)
+    st.write("Transcript Extracted Successfully ✅")
+    st.text_area(
+        "Extracted Transcript",
+        transcript_text,
+        height=250
     )
-
-    q2 = st.radio(
-        "2. Vocabulary means:",
-        [
-            "Collection of words",
-            "Video subtitles",
-            "A language translator",
-            "Speech recognition"
-        ]
-    )
-
-    q3 = st.radio(
-        "3. Comprehension means:",
-        [
-            "Understanding",
-            "Translation",
-            "Speaking",
-            "Reading speed"
-        ]
-    )
-
-    if st.button("Submit Quiz"):
-
-        score = 0
-
-        if q1 == "A written version of speech":
-            score += 1
-
-        if q2 == "Collection of words":
-            score += 1
-
-        if q3 == "Understanding":
-            score += 1
-
-        st.success(f"🎉 Your Score: {score}/3")
-
-st.markdown("---")
-st.caption(
-    "Velora-AI | Built with Streamlit, Gemini API, LangChain & LlamaIndex"
-)
