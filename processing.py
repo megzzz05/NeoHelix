@@ -2,13 +2,11 @@ import re
 import os
 import json
 import requests
-import json
-import requests
 from dotenv import load_dotenv
 from youtube_transcript_api import YouTubeTranscriptApi
 from openai import OpenAI
 
-# RAG & Vector DB Imports (Moved cleanly to the top)
+# RAG & Vector DB Imports
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import chromadb
 from chromadb.utils import embedding_functions
@@ -84,29 +82,6 @@ def get_transcript(video_url):
                     return None, "IP_BLOCKED_WITH_COOKIES"
             return None, f"Error extracting transcript: {str(inner_e)}"
 
-        cookie_path = "cookies.txt" if os.path.exists("cookies.txt") else None
-
-        try:
-            if cookie_path:
-                session = _build_session_with_cookies(cookie_path)
-                api = YouTubeTranscriptApi(http_client=session)
-            else:
-                api = YouTubeTranscriptApi()
-
-            transcript = api.fetch(video_id)
-
-        except Exception as inner_e:
-            err_str = str(inner_e).lower()
-            is_ip_ban = any(k in err_str for k in [
-                "blocking", "ipblocked", "requestblocked", "could not retrieve"
-            ])
-            if is_ip_ban:
-                if not cookie_path:
-                    return None, "IP_BLOCKED_NO_COOKIES"
-                else:
-                    return None, "IP_BLOCKED_WITH_COOKIES"
-            return None, f"Error extracting transcript: {str(inner_e)}"
-
         full_text = " ".join([item.text for item in transcript])
         return full_text, None
 
@@ -120,7 +95,6 @@ def generate_summary(collection, target_language):
     try:
         groq_api_key = os.getenv("GROQ_API_KEY")
         if not groq_api_key:
-            return "Error: Groq API key not configured."
             return "Error: Groq API key not configured."
 
         client = OpenAI(
@@ -138,7 +112,6 @@ def generate_summary(collection, target_language):
         prompt = f"""
         You are an expert language learning assistant. Analyze the provided context excerpts from a video transcript and generate a comprehensive, structured learning summary.
         
-        CRITICAL REQUIREMENT: Write the entire response, including headings, in the target language: {target_language}.
         CRITICAL REQUIREMENT: Write the entire response, including headings, in the target language: {target_language}.
         
         Provide the output matching this structure exactly:
@@ -160,10 +133,7 @@ def generate_summary(collection, target_language):
 
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
-            model="llama-3.3-70b-versatile",
             messages=[
-                {"role": "system", "content": "You are an expert multilingual language learning assistant."},
-                {"role": "user", "content": prompt}
                 {"role": "system", "content": "You are an expert multilingual language learning assistant."},
                 {"role": "user", "content": prompt}
             ],
@@ -235,6 +205,7 @@ def generate_quiz(collection, target_language):
     except Exception as e:
         print(f"Quiz generation error: {e}")
         return None
+
 # ----------------------------------------
 # RAG Operations: Vector Storage Initialization
 # ----------------------------------------
@@ -250,7 +221,7 @@ def create_vector_store(transcript_text, video_id):
         )
         chunks = text_splitter.split_text(transcript_text)
         
-        # Step B: Set up OpenAI embedding function (Requires OPENAI_API_KEY in your .env)
+        # Step B: Set up local embedding function (SentenceTransformer runs free, locally on CPU/GPU)
         openai_ef = embedding_functions.SentenceTransformerEmbeddingFunction(
             model_name="all-MiniLM-L6-v2"
         )
