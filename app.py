@@ -2,8 +2,13 @@ import streamlit as st
 from dotenv import load_dotenv
 import os
 
+<<<<<<< HEAD
 # Consolidated single clean import interface
 from processing import get_transcript, generate_summary, generate_quiz
+=======
+# Updated clean import interface to bring in RAG utilities
+from processing import get_transcript, generate_summary, extract_video_id, create_vector_store, generate_quiz
+>>>>>>> 97007e1 (updated)
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -100,6 +105,7 @@ if generate:
             st.error(f"❌ {error}")
         else:
             st.toast("Transcript processed successfully!", icon="✅")
+<<<<<<< HEAD
             with st.spinner("AI is synthesizing deep learning cards..."):
                 summary_result = generate_summary(transcript_text, language)
             with st.spinner("Generating personalized quiz questions..."):
@@ -112,6 +118,31 @@ if generate:
             st.session_state["quiz_submitted"] = False
             st.session_state["user_answers"] = {}
             st.rerun()
+=======
+            
+            # --- RAG Integration Pipeline Step ---
+            with st.spinner("Initializing Local Vector Database & Splitting Chunks..."):
+                video_id = extract_video_id(youtube_url) or "default_id"
+                collection, vector_error = create_vector_store(transcript_text, video_id)
+            
+            if vector_error:
+                st.error(f"❌ {vector_error}")
+            else:
+                with st.spinner("AI is synthesizing deep learning cards..."):
+                    summary_result = generate_summary(collection, language)
+                
+                with st.spinner("Generating personalized quiz questions via Semantic Vector Search..."):
+                    # Passing the vector collection database object right into your quiz generator
+                    quiz_data = generate_quiz(collection, language)
+
+                st.session_state["transcript_text"] = transcript_text
+                st.session_state["summary_result"] = summary_result
+                st.session_state["quiz_data"] = quiz_data
+                st.session_state["current_language"] = language
+                st.session_state["quiz_submitted"] = False
+                st.session_state["user_answers"] = {}
+                st.rerun()
+>>>>>>> 97007e1 (updated)
 
 if st.session_state.get("transcript_text"):
     transcript_text = st.session_state["transcript_text"]
@@ -181,4 +212,8 @@ if st.session_state.get("transcript_text"):
                     st.session_state["user_answers"] = {}
                     st.rerun()
 
+<<<<<<< HEAD
             st.markdown("</div>", unsafe_allow_html=True)
+=======
+            st.markdown("</div>", unsafe_allow_html=True)
+>>>>>>> 97007e1 (updated)
