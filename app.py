@@ -2,11 +2,9 @@ import streamlit as st
 from dotenv import load_dotenv
 import os
 
-# Load environment variables
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# Placeholder imports for backend functions
 from processing import get_transcript, generate_summary
 
 st.set_page_config(
@@ -14,10 +12,6 @@ st.set_page_config(
     page_icon="🌍",
     layout="wide"
 )
-
-# --------------------------------------------------
-# Premium Dark Theme & JavaScript Border Glow Styling
-# --------------------------------------------------
 st.markdown("""
 <style>
 /* Global App Background Set to Dark Slate */
@@ -25,7 +19,6 @@ st.markdown("""
     background-color: #0B090F;
 }
 
-/* Custom Header with Deep Luxury Violet Gradient Background */
 .hero-container {
     background: linear-gradient(135deg, #1C162E 0%, #0F0C1B 100%);
     padding: 3rem 2rem;
