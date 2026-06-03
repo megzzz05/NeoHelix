@@ -8,7 +8,6 @@ Velora-AI is an AI-powered language learning assistant developed by **NeoHelix**
 # Features
 
 * 🎥 YouTube video transcript extraction
-* 📄 AI-generated video summaries
 * 🌐 Multilingual summary generation
 * 📚 Vocabulary extraction from transcripts
 * 📝 AI-generated MCQs for learning
