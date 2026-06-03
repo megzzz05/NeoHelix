@@ -295,11 +295,18 @@ if generate:
                         summary_result = generate_summary(transcript_text, language)
                     
                     # Wrap output notes cleanly inside a static border glow block variant
+                    # Open the HTML wrapper
                     st.markdown(f"""
                     <div class="border-glow-card" style="--edge-proximity: 100; --cursor-angle: 120deg;">
                         <div class="edge-light"></div>
                         <div style="color: #E2E8F0; line-height: 1.7;">
-                            {summary_result}
+                    """, unsafe_allow_html=True)
+                    
+                    # Render Markdown safely using Streamlit's native parser inside the container
+                    st.markdown(summary_result)
+                    
+                    # Close the HTML wrapper safely
+                    st.markdown("""
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
