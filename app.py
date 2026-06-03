@@ -2,9 +2,11 @@ import streamlit as st
 from dotenv import load_dotenv
 import os
 
+# Load environment variables
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+# Placeholder imports for backend functions
 from processing import get_transcript, generate_summary
 
 st.set_page_config(
@@ -12,6 +14,10 @@ st.set_page_config(
     page_icon="🌍",
     layout="wide"
 )
+
+# --------------------------------------------------
+# Premium Dark Theme & JavaScript Border Glow Styling
+# --------------------------------------------------
 st.markdown("""
 <style>
 /* Global App Background Set to Dark Slate */
@@ -19,6 +25,7 @@ st.markdown("""
     background-color: #0B090F;
 }
 
+/* Custom Header with Deep Luxury Violet Gradient Background */
 .hero-container {
     background: linear-gradient(135deg, #1C162E 0%, #0F0C1B 100%);
     padding: 3rem 2rem;
@@ -113,7 +120,7 @@ st.markdown("""
     mask-image: conic-gradient(from var(--cursor-angle) at center, black calc(var(--cone-spread) * 1%), transparent calc((var(--cone-spread) + 15) * 1%), transparent calc((100 - var(--cone-spread) - 15) * 1%), black calc((100 - var(--cone-spread)) * 1%));
 }
 
-.border-glow-card::after {
+.border-glow-card::after {ß
     border: 1px solid transparent;
     background: var(--gradient-one) padding-box, var(--gradient-two) padding-box, var(--gradient-three) padding-box, var(--gradient-four) padding-box, var(--gradient-five) padding-box, var(--gradient-six) padding-box, var(--gradient-seven) padding-box, var(--gradient-base) padding-box;
     
@@ -288,18 +295,11 @@ if generate:
                         summary_result = generate_summary(transcript_text, language)
                     
                     # Wrap output notes cleanly inside a static border glow block variant
-                    # Open the HTML wrapper
                     st.markdown(f"""
                     <div class="border-glow-card" style="--edge-proximity: 100; --cursor-angle: 120deg;">
                         <div class="edge-light"></div>
                         <div style="color: #E2E8F0; line-height: 1.7;">
-                    """, unsafe_allow_html=True)
-                    
-                    # Render Markdown safely using Streamlit's native parser inside the container
-                    st.markdown(summary_result)
-                    
-                    # Close the HTML wrapper safely
-                    st.markdown("""
+                            {summary_result}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
